@@ -1,0 +1,3 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+export async function POST(request:NextRequest){const {email,password}=await request.json();const url=process.env.NEXT_PUBLIC_SUPABASE_URL;const key=process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;if(!url||!key)return NextResponse.json({error:"Supabase yapılandırılmadı"},{status:503});const response=NextResponse.json({ok:true});const supabase=createServerClient(url,key,{cookies:{getAll:()=>request.cookies.getAll(),setAll:items=>items.forEach(({name,value,options})=>response.cookies.set(name,value,options))}});const {error}=await supabase.auth.signInWithPassword({email,password});if(error)return NextResponse.json({error:error.message},{status:401});return response;}
